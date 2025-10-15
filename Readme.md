@@ -90,11 +90,13 @@ kubectl apply -f vayu-routes.yaml
 
 Example vayu-routes.yaml:
 ```yaml
+server:
+  port: 8080
 routes:
   - path: /users
-    backend: http://user-service:8080
+    upstream: http://localhost:8081
   - path: /orders
-    backend: http://order-service:8080
+    upstream: http://localhost:8082
 ```
 
 ## 🛣️ Roadmap
