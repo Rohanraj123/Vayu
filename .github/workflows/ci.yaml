@@ -1,0 +1,43 @@
+---
+name: CI Pipeline
+on:
+  push:
+    branches: ["main"]
+  pull_requests:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ["ubuntu-latest"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+        
+      - name: Lint and Vet 
+        run: |
+          go fmt ./... 
+          go vet ./...
+          go install honnef.co/go/tools/cmd/staticcheck@latest
+          staticcheck ./...
+        
+      - name: Build binary
+        run: |
+          go build -o vayu ./main.go
+
+      - name: Run Integration tests
+        run: |
+          chmod +x test-env/test_gateway.sh 
+          ./test-env/test_gateway.sh
+      
+      - name: Upload the binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vayu-binary
+          path: vayu
