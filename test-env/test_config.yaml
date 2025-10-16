@@ -1,0 +1,8 @@
+server:
+  port: 8080
+
+routes:
+  - path: /users
+    upstream: http://localhost:9001
+  - path: /orders
+    upstream: http://localhost:9002

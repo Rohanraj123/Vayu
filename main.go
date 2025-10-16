@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/Rohanraj123/vayu/internal/config"
+	"github.com/Rohanraj123/vayu/internal/middleware"
 	"github.com/Rohanraj123/vayu/internal/router"
 )
 
@@ -23,10 +24,12 @@ func main() {
 
 	mux := router.NewRouter(cfg)
 
+	handler := middleware.LoggingMiddleware(mux)
+
 	addr := fmt.Sprintf(":%d", cfg.Server.Port)
 	log.Printf("🚀 API Gateway started on port %d", cfg.Server.Port)
 
-	if err := http.ListenAndServe(addr, mux); err != nil {
+	if err := http.ListenAndServe(addr, handler); err != nil {
 		log.Fatalf("Server error: %v", err)
 	}
 }
