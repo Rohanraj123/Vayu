@@ -33,8 +33,8 @@ jobs:
 
       - name: Run Integration tests
         run: |
-          chmod +x test-env/test_gateway.sh 
-          ./test-env/test_gateway.sh
+          chmod +x tests/test-routing/test_gateway.sh 
+          ./tests/test-routing/test_gateway.sh
       
       - name: Upload the binary artifact
         uses: actions/upload-artifact@v4

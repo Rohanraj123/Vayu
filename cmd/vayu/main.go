@@ -24,7 +24,9 @@ func main() {
 
 	mux := router.NewRouter(cfg)
 
-	handler := middleware.LoggingMiddleware(mux)
+	handler := middleware.LoggingMiddleware(
+		middleware.AuthMiddleware(
+			*cfg, mux))
 
 	addr := fmt.Sprintf(":%d", cfg.Server.Port)
 	log.Printf("🚀 API Gateway started on port %d", cfg.Server.Port)
