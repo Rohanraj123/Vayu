@@ -1,0 +1,27 @@
+server:
+  port: 8080
+  read_timeout: 5s
+  write_timeout: 10s
+  idle_timeout: 120s
+
+logging:
+  level: info # options: debug, info, warn, error
+  format: text # options: json, text
+
+auth:
+  mode: none # options: none, api_key
+  api_key_header: ""
+  valid_keys: 
+    - "my-valid-key"
+    - "secret-key-abxc"
+
+routes:
+  - path: /users
+    upstream: http://localhost:9001
+    methods: ["GET", "POST"]
+    auth_required: true
+
+  - path: /orders
+    upstream: http://localhost:9002
+    methods: ["GET"]
+    auth_required: false

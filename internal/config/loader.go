@@ -7,20 +7,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type Route struct {
-	Path     string `yaml:"path"`
-	Upstream string `yaml:"upstream"`
-}
-
-type ServerConfig struct {
-	Port int `yaml:"port"`
-}
-
-type Config struct {
-	Server ServerConfig `yaml:"server"`
-	Routes []Route      `yaml:"routes"`
-}
-
+// Loads configuration file
 func LoadConfig(path string) (*Config, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {

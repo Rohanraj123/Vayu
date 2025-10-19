@@ -1,0 +1,25 @@
+server:
+  port: 8087
+  read_timeout: 5s
+  write_timeout: 10s 
+  idle_timeout: 120s
+
+logging:
+  format: text
+  level: info
+
+auth:
+  mode: api_key
+  api_key_header: "sajlksf"
+  valid_keys: 
+    - "sajlksf"
+
+routes:
+  - path: /users
+    upstream: http://localhost:9001
+    auth_required: true
+    methods: ["GET"]
+  - path: /orders
+    upstream: http://localhost:9002
+    auth_required: false
+    methods: ["GET"]
