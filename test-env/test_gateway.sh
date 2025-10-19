@@ -18,7 +18,7 @@ go run test-env/backend-orders/test_server.go > test-env/orders.log 2>&1 & ORDER
 sleep 2
 
 echo -e "${YELLOW}🚀 Starting Vayu API Gateway...${NC}"
-go run main.go test-env/test_config.yaml > test-env/vayu.log 2>&1 &
+go run cmd/vayu/main.go test-env/test_config.yaml > test-env/vayu.log 2>&1 &
 VAYU_PID=$!
 
 # Wait for gateway to start
@@ -42,6 +42,7 @@ echo -e "${YELLOW}✅ All tests completed.${NC}"
 trap "echo -e '\n🧹 Cleaning up...'; kill $USERS_PID $ORDERS_PID $VAYU_PID 2>/dev/null || true" EXIT
 
 # Removal of temp files
+# Remove below lines if you want to check the logs in the temp files. 
 rm test-env/orders.log
 rm test-env/vayu.log
 rm test-env/users.log
