@@ -10,16 +10,16 @@ logging:
 
 auth:
   mode: api_key
-  api_key_header: "sajlksf"
-  valid_keys: 
-    - "sajlksf"
+  enabled: true
 
 routes:
   - path: /users
     upstream: http://localhost:9001
     auth_required: true
     methods: ["GET"]
+    service: "users"
   - path: /orders
     upstream: http://localhost:9002
     auth_required: false
     methods: ["GET"]
+    service: "orders"
