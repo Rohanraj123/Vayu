@@ -24,6 +24,7 @@ type RouteConfig struct {
 	Upstream     string   `yaml:"upstream"`
 	Methods      []string `yaml:"methods"`
 	AuthRequired bool     `yaml:"auth_required"`
+	Service      string   `yaml:"service"`
 }
 
 // ─── LOGGING CONFIG ───────────────────────────────────────────────────────────────
@@ -34,7 +35,6 @@ type LoggingConfig struct {
 
 // ─── AUTH CONFIG ───────────────────────────────────────────────────────────────
 type AuthConfig struct {
-	Mode         string   `yaml:"mode"`
-	ApiKeyHeader string   `yaml:"api_key_header"`
-	ValidKeys    []string `yaml:"valid_keys"`
+	Mode    string `yaml:"mode"`
+	Enabled bool   `yaml:"enabled"`
 }

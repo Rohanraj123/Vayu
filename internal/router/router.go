@@ -4,12 +4,19 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/Rohanraj123/vayu/internal/apis"
 	"github.com/Rohanraj123/vayu/internal/config"
 	"github.com/Rohanraj123/vayu/internal/proxy"
+	"k8s.io/client-go/kubernetes"
 )
 
-func NewRouter(cfg *config.Config) *http.ServeMux {
+func NewRouter(cfg *config.Config, clientset *kubernetes.Clientset) *http.ServeMux {
 	mux := http.NewServeMux()
+
+	// add handlers
+	mux.HandleFunc("/api-keys", func(w http.ResponseWriter, r *http.Request) {
+		apis.CreateApiKeyHandler(w, r, clientset)
+	})
 
 	for _, route := range cfg.Routes {
 		handler, err := proxy.ProxyHandler(route.Upstream)
