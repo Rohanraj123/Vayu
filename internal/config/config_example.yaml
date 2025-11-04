@@ -9,11 +9,8 @@ logging:
   format: text # options: json, text
 
 auth:
-  mode: none # options: none, api_key
-  api_key_header: ""
-  valid_keys: 
-    - "my-valid-key"
-    - "secret-key-abxc"
+  mode: api_key # options: none, api_key
+  enabled: true
 
 routes:
   - path: /users

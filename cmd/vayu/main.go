@@ -9,6 +9,8 @@ import (
 	"github.com/Rohanraj123/vayu/internal/config"
 	"github.com/Rohanraj123/vayu/internal/middleware"
 	"github.com/Rohanraj123/vayu/internal/router"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 )
 
 func main() {
@@ -16,17 +18,30 @@ func main() {
 		log.Fatal("Usage: ./api-gateway <config-file>")
 	}
 
+	// builds config from service account credentials mounted in pod
+	clusterConfig, err := rest.InClusterConfig()
+	if err != nil {
+		log.Fatalf("failed to get incluster-config: %v", err)
+	}
+
+	// creates a clientset-an object gives access to different k8s resources
+	clientset, err := kubernetes.NewForConfig(clusterConfig)
+	if err != nil {
+		log.Fatalf("failed to create k8s clientset: %v", err)
+	}
+
 	configPath := os.Args[1]
 	cfg, err := config.LoadConfig(configPath)
+
 	if err != nil {
 		log.Fatalf("Error loading config: %v", err)
 	}
 
-	mux := router.NewRouter(cfg)
+	mux := router.NewRouter(cfg, clientset)
 
 	handler := middleware.LoggingMiddleware(
 		middleware.AuthMiddleware(
-			*cfg, mux))
+			*cfg, mux, clientset))
 
 	addr := fmt.Sprintf(":%d", cfg.Server.Port)
 	log.Printf("🚀 API Gateway started on port %d", cfg.Server.Port)
