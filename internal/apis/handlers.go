@@ -52,16 +52,16 @@ func storeKeyInSecret(service string, key string, clientset *kubernetes.Clientse
 	secret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "vayu-api-keys",
-			Namespace: "default",
+			Namespace: "vayu-system",
 		},
 		StringData: map[string]string{
 			service: key,
 		},
 	}
-	_, err := clientset.CoreV1().Secrets("default").Create(context.TODO(), secret, metav1.CreateOptions{})
+	_, err := clientset.CoreV1().Secrets("vayu-system").Create(context.TODO(), secret, metav1.CreateOptions{})
 	if err != nil {
 		// If already exist, update it instead
-		_, err = clientset.CoreV1().Secrets("default").Update(context.TODO(), secret, metav1.UpdateOptions{})
+		_, err = clientset.CoreV1().Secrets("vayu-system").Update(context.TODO(), secret, metav1.UpdateOptions{})
 	}
 
 	return err
