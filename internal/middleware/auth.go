@@ -43,7 +43,7 @@ func AuthMiddleware(cfg config.Config, next http.Handler, clientset *kubernetes.
 			return
 		}
 
-		secret, _ := clientset.CoreV1().Secrets("default").Get(context.TODO(), "vayu-api-keys", metav1.GetOptions{})
+		secret, _ := clientset.CoreV1().Secrets("vayu-system").Get(context.TODO(), "vayu-api-keys", metav1.GetOptions{})
 		storedHashKey := string(secret.Data[route.Service])
 
 		if !compareHash(storedHashKey, apiKey) {
