@@ -37,6 +37,7 @@ func main() {
 		log.Fatalf("Error loading config: %v", err)
 	}
 
+	// create a new mux
 	mux := router.NewRouter(cfg, clientset)
 
 	handler := middleware.LoggingMiddleware(

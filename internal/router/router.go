@@ -17,6 +17,12 @@ func NewRouter(cfg *config.Config, clientset *kubernetes.Clientset) *http.ServeM
 	mux.HandleFunc("/api-keys", func(w http.ResponseWriter, r *http.Request) {
 		apis.CreateApiKeyHandler(w, r, clientset)
 	})
+	mux.HandleFunc("/healtz", func(w http.ResponseWriter, r *http.Request) {
+		apis.HealthzHandler(w, r)
+	})
+	mux.HandleFunc("/readyz", func(w http.ResponseWriter, r *http.Request) {
+		apis.ReadyzHandler(w, r)
+	})
 
 	for _, route := range cfg.Routes {
 		handler, err := proxy.ProxyHandler(route.Upstream)
