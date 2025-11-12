@@ -33,9 +33,9 @@ jobs:
 
       - name: Run Integration tests
         run: |
-          chmod +x tests/test-routing/test_gateway.sh 
-          ./tests/test-routing/test_gateway.sh
-      
+          chmod +x tests/test-api_keys/test-api_keys.sh
+          ./tests/test-api_keys/test-api_keys.sh
+
       - name: Upload the binary artifact
         uses: actions/upload-artifact@v4
         with:

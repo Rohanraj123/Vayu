@@ -1,3 +1,4 @@
+# config-file used in tests/test-api_keys/ folder. 
 server:
   port: 8087
   read_timeout: 5s
@@ -10,12 +11,12 @@ logging:
 
 auth:
   mode: api_key
-  enabled: false
+  enabled: true
 
 routes:
   - path: /users
     upstream: http://localhost:9001
-    auth_required: false
+    auth_required: true
     methods: ["GET"]
     service: "users"
   - path: /orders
