@@ -1,0 +1,33 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vayu
+  namespace: vayu-system
+  labels:
+    app: vayu
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vayu
+  template:
+    metadata:
+      labels:
+        app: vayu
+    spec:
+      serviceAccountName: vayu-sa
+      volumes:
+      - name: logs
+        configMap:
+          name: config
+      containers:
+      - name: vayu
+        image: rohanraj123/vayu:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8087
+        volumeMounts:
+        - name: logs
+          mountPath: /app/config.yaml
+          subPath: config.yaml
