@@ -42,8 +42,10 @@ func main() {
 
 	// adding different layers of middlewares
 	handler := middleware.LoggingMiddleware(
-		middleware.AuthMiddleware(
-			*cfg, mux, clientset))
+		middleware.RateLimitMiddleware(&cfg.RateLimit,
+			middleware.AuthMiddleware(
+				*cfg, mux, clientset),
+		))
 
 	addr := fmt.Sprintf(":%d", cfg.Server.Port)
 	log.Printf("🚀 API Gateway started on port %d", cfg.Server.Port)
