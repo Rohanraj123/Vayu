@@ -24,7 +24,7 @@ func main() {
 		log.Fatalf("failed to get incluster-config: %v", err)
 	}
 
-	// creates a clientset-an object gives access to different k8s resources
+	// creates a clientset - an object gives access to different k8s resources
 	clientset, err := kubernetes.NewForConfig(clusterConfig)
 	if err != nil {
 		log.Fatalf("failed to create k8s clientset: %v", err)
@@ -40,6 +40,7 @@ func main() {
 	// create a new mux
 	mux := router.NewRouter(cfg, clientset)
 
+	// adding different layers of middlewares
 	handler := middleware.LoggingMiddleware(
 		middleware.AuthMiddleware(
 			*cfg, mux, clientset))

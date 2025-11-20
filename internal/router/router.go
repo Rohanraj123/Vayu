@@ -24,6 +24,7 @@ func NewRouter(cfg *config.Config, clientset *kubernetes.Clientset) *http.ServeM
 		apis.ReadyzHandler(w, r)
 	})
 
+	// routes in config file
 	for _, route := range cfg.Routes {
 		handler, err := proxy.ProxyHandler(route.Upstream)
 		if err != nil {

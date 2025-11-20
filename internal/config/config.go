@@ -18,13 +18,23 @@ type ServerConfig struct {
 	IdleTimeount  time.Duration `yaml:"idle_timeount"`
 }
 
+// ─── RATE-LIMIT CONFIG ───────────────────────────────────────────────────────────────
+// rules defined by admin
+type RateLimitConfig struct {
+	Enabled          bool   `yaml:"enabled"`
+	RequestPerMinute int    `yaml:"request_per_minute"`
+	Burst            int    `yaml:"burst"`
+	KeyScope         string `yaml:"key_scope"`
+}
+
 // ─── ROUTE CONFIG ───────────────────────────────────────────────────────────────
 type RouteConfig struct {
-	Path         string   `yaml:"path"`
-	Upstream     string   `yaml:"upstream"`
-	Methods      []string `yaml:"methods"`
-	AuthRequired bool     `yaml:"auth_required"`
-	Service      string   `yaml:"service"`
+	Path         string          `yaml:"path"`
+	Upstream     string          `yaml:"upstream"`
+	Methods      []string        `yaml:"methods"`
+	AuthRequired bool            `yaml:"auth_required"`
+	Service      string          `yaml:"service"`
+	RateLimit    RateLimitConfig `yaml:"rate_limit"`
 }
 
 // ─── LOGGING CONFIG ───────────────────────────────────────────────────────────────
