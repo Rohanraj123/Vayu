@@ -4,10 +4,11 @@ import "time"
 
 // Root Configuration struct
 type Config struct {
-	Server  ServerConfig  `yaml:"server"`
-	Routes  []RouteConfig `yaml:"routes"`
-	Logging LoggingConfig `yaml:"logging"`
-	Auth    AuthConfig    `yaml:"auth"`
+	Server    ServerConfig    `yaml:"server"`
+	Routes    []RouteConfig   `yaml:"routes"`
+	Logging   LoggingConfig   `yaml:"logging"`
+	Auth      AuthConfig      `yaml:"auth"`
+	RateLimit RateLimitConfig `yaml:"rate_limit"`
 }
 
 // ─── SERVER CONFIG ───────────────────────────────────────────────────────────────
@@ -29,12 +30,11 @@ type RateLimitConfig struct {
 
 // ─── ROUTE CONFIG ───────────────────────────────────────────────────────────────
 type RouteConfig struct {
-	Path         string          `yaml:"path"`
-	Upstream     string          `yaml:"upstream"`
-	Methods      []string        `yaml:"methods"`
-	AuthRequired bool            `yaml:"auth_required"`
-	Service      string          `yaml:"service"`
-	RateLimit    RateLimitConfig `yaml:"rate_limit"`
+	Path         string   `yaml:"path"`
+	Upstream     string   `yaml:"upstream"`
+	Methods      []string `yaml:"methods"`
+	AuthRequired bool     `yaml:"auth_required"`
+	Service      string   `yaml:"service"`
 }
 
 // ─── LOGGING CONFIG ───────────────────────────────────────────────────────────────

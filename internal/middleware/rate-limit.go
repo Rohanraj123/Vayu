@@ -2,45 +2,100 @@ package middleware
 
 import (
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/Rohanraj123/vayu/internal/config"
 )
 
 // RateLimiter object is used for dynamic runtime tracking
-type rateLimiter struct {
-	tokens     int
-	capacity   int     // burst
-	refillRate float64 // requests_per_minute
-	lastRefill time.Duration
+type RateLimiter struct {
+	mu         sync.Mutex
+	tokens     float64
+	capacity   float64 // burst
+	refillRate float64 // tokens_per_second
+	lastRefill time.Time
 }
 
-// new object generator
+// create a new rate-limiter
 func NewRateLimiter(
-	tokens int,
-	capacity int,
-	refillRate float64,
-	lastRefill time.Duration,
-) *rateLimiter {
-	return &rateLimiter{
-		tokens:     tokens,
-		capacity:   capacity,
-		refillRate: refillRate,
-		lastRefill: lastRefill,
+	cfg *config.RateLimitConfig,
+) *RateLimiter {
+	return &RateLimiter{
+		tokens:     float64(cfg.Burst),
+		capacity:   float64(cfg.Burst),
+		refillRate: float64(cfg.RequestPerMinute) / 60.0,
+		lastRefill: time.Now(),
 	}
 }
 
-// rate-limit handler func
-func RateLimitMiddleware(cfg *config.Config, next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+// Store all API-KEY limiters
+var limitStore = struct {
+	sync.RWMutex
+	store map[string]*RateLimiter
+}{store: make(map[string]*RateLimiter)}
 
+// rate-limit handler func
+func RateLimitMiddleware(cfg *config.RateLimitConfig, next http.Handler) http.Handler {
+	if !cfg.Enabled {
+		return next
+	}
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		apiKey := r.Header.Get("X-API-KEY")
+		if apiKey == "" {
+			http.Error(w, "missing API KEY for rate-limiting", http.StatusUnauthorized)
+			return
+		}
+
+		limiter := getLimiter(apiKey, *cfg)
+		if !limiter.Allow() {
+			http.Error(w, "TOO MANY REQUESTS - rate limit exceeded", http.StatusTooManyRequests)
+			return
+		}
+
+		next.ServeHTTP(w, r)
 	})
 }
 
-// admin will configure the rate_limitting using config.yaml file
-// Then when ever it generates the API_KEY, it stores the in-memory map for API_KEY and rateLimitConfig
-// Once the user request with API_KEY then it extracts the API_KEY and then check whether tokenBucket is
-// available or not. If available, it then decreases the value by 1 and allows the request and if not
-// then decline the request.
+// Get or Create RateLimiter API-KEY
+func getLimiter(apiKey string, cfg config.RateLimitConfig) *RateLimiter {
+	limitStore.RLock()
+	limiter := limitStore.store[apiKey]
+	limitStore.RUnlock()
 
-// it also keep on checking the time and refils the bucket again and again upto full capacity.
+	if limiter != nil {
+		return limiter
+	}
+
+	// Create a new limiter
+	limitStore.Lock()
+	defer limitStore.Unlock()
+
+	limiter = NewRateLimiter(&cfg)
+	limitStore.store[apiKey] = limiter
+	return limiter
+}
+
+// consume token
+func (rl *RateLimiter) Allow() bool {
+	rl.mu.Lock()
+	defer rl.mu.Unlock()
+
+	// Refill tokens based on elapsed time
+	now := time.Now()
+	elapsed := now.Sub(rl.lastRefill).Seconds()
+	rl.tokens += elapsed * rl.refillRate
+	if rl.tokens > rl.capacity {
+		rl.tokens = rl.capacity
+	}
+
+	rl.lastRefill = now
+
+	// Check if a token is available
+	if rl.tokens >= 1 {
+		rl.tokens -= 1
+		return true
+	}
+
+	return false
+}
